@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 //connect to mongodb
-const uri = `mongodb+srv://SuperCar:RHtdAVjlDjxhKnpz@cluster0.hplqh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hplqh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -26,9 +26,9 @@ async function run() {
     await client.connect((err) => {
       const db = client.db("SuperCar");
       const djiPackages = db.collection("Cars");
-      const bookingsCollection = db.collection("bookings");
-      const testimonialCollection = db.collection("testimonials");
-      const usersCollection = db.collection("users");
+      const bookingsCollection = db.collection("booking");
+      const testimonialCollection = db.collection("testimonial");
+      const usersCollection = db.collection("user");
 
       // ==============GET API ====================
       //GET API
@@ -43,13 +43,13 @@ async function run() {
       });
 
       //GET API (users)
-      app.get("/users", async (req, res) => {
+      app.get("/user", async (req, res) => {
         const result = await usersCollection.find({}).toArray();
         res.send(result);
       });
 
       // verify admin data form database
-      app.get("/users/:email", async (req, res) => {
+      app.get("/user/:email", async (req, res) => {
         const email = req.params.email;
         const query = { email: email };
         const user = await usersCollection.findOne(query);
@@ -62,7 +62,7 @@ async function run() {
       });
 
       //GET API (Bookings)
-      app.get("/bookings", async (req, res) => {
+      app.get("/booking", async (req, res) => {
         let query = {};
         const email = req.query.email;
         if (email) {
@@ -89,7 +89,7 @@ async function run() {
       });
 
       //GET (testimonials)
-      app.get("/testimonials", async (req, res) => {
+      app.get("/testimonial", async (req, res) => {
         const result = await testimonialCollection.find({}).toArray();
         res.send(result);
       });
@@ -111,14 +111,14 @@ async function run() {
       });
 
       //POST API (Bookings )
-      app.post("/bookings", async (req, res) => {
+      app.post("/booking", async (req, res) => {
         const newBooking = req.body;
         const result = await bookingsCollection.insertOne(newBooking);
         res.send(result);
       });
 
       //POST API (Testimonials )
-      app.post("/testimonials", async (req, res) => {
+      app.post("/testimonial", async (req, res) => {
         const newBooking = req.body;
         // console.log(newBooking);
         const result = await testimonialCollection.insertOne(newBooking);
